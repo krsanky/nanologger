@@ -31,6 +31,7 @@ client()
 		nn_fatal("nn_recv");
 	}
 	printf("NODE1: RECEIVED DATE %s\n", buf);
+	wikilog("NODE1: RECEIVED DATE ...");
 	nn_freemsg(buf);
 	return (nn_shutdown(sock, rv));
 }
