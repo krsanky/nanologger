@@ -1,7 +1,7 @@
 # Nanologger
 
 This is meant to be a persistent program to log messages from
-(lightweight) client programs via [https://nanomsg.org/](nanomsg).
+(lightweight) client programs via [nanomsg](https://nanomsg.org/).
 It started as a way to (centrally) log messages from stateless
 fastcgi programs on OpenBSD.
 
