@@ -4,9 +4,9 @@
 #include <stdarg.h>
 #include <nanomsg/nn.h>
 #include <nanomsg/reqrep.h>
+#include <dirent.h>
 
 #include "settings.h"
-#include "util.h"
 
 void
 nn_fatal(const char *func)
