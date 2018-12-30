@@ -4,17 +4,15 @@
 #include <stdarg.h>
 #include <nanomsg/nn.h>
 #include <nanomsg/reqrep.h>
-#include <dirent.h>
 
-#include "settings.h"
+#include "client.h"
 
 void
-nn_fatal(const char *func)
+nnclient_fatal(const char *func)
 {
 	fprintf(stderr, "%s: %s\n", func, nn_strerror(nn_errno()));
 	exit(1);
 }
-
 
 int
 nlog(const char *fmt,...)
@@ -37,6 +35,9 @@ nlog(const char *fmt,...)
 int
 wikilog(char *msg)
 {
+	/* TODO: pass in port ? */
+	char		*SERVER_ENDPOINT = "tcp://127.0.0.1:23000";
+	char		*LOG_PREFIX = "LOG-";
 	char	       *msg_;
 	int		msg_l;
 	char	       *buf;
@@ -45,10 +46,10 @@ wikilog(char *msg)
 	int		rv;
 
 	if ((sock = nn_socket(AF_SP, NN_REQ)) < 0) {
-		nn_fatal("nn_socket");
+		nnclient_fatal("nn_socket");
 	}
 	if ((rv = nn_connect(sock, SERVER_ENDPOINT)) < 0) {
-		nn_fatal("nn_connect");
+		nnclient_fatal("nn_connect");
 	}
 	msg_l = strlen(msg) + sizeof(LOG_PREFIX);
 	msg_ = malloc(msg_l);
@@ -56,10 +57,10 @@ wikilog(char *msg)
 	strlcat(msg_, msg, msg_l);
 
 	if ((bytes = nn_send(sock, msg_, strlen(msg_) + 1, 0)) < 0) {
-		nn_fatal("nn_send");
+		nnclient_fatal("nn_send");
 	}
 	if ((bytes = nn_recv(sock, &buf, NN_MSG, 0)) < 0) {
-		nn_fatal("nn_recv");
+		nnclient_fatal("nn_recv");
 	}
 	free(msg_);
 	nn_freemsg(buf);

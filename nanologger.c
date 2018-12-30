@@ -5,10 +5,14 @@
 #include <nanomsg/nn.h>
 #include <nanomsg/reqrep.h>
 
-#include "settings.h"
-#include "util.h"
-
 FILE           *logfile;
+
+void
+nn_fatal(const char *func)
+{
+	fprintf(stderr, "%s: %s\n", func, nn_strerror(nn_errno()));
+	exit(1);
+}
 
 char           *
 date(void)
@@ -23,6 +27,7 @@ date(void)
 void
 dispatch(char *msg, int sock)
 {
+	char		*LOG_PREFIX = "LOG";
 	int 		bytes;
 
 	if (strcmp(msg, "DATE") == 0) {
@@ -81,15 +86,25 @@ server(const char *url)
 	}
 }
 
-/*
- * All major routines should have a comment briefly describing what they do.
- * The comment before the "main" routine should describe what the program
- * does.
- */
 int
 main(int argc, char **argv)
 {
-	printf("I am %s argc:%d\n", argv[0], argc);
+	int		l1 = 128;
+	char		server_endpoint[l1];
+
+	printf("nanologer [port]\n");
+	printf("%s %d\n", argv[0], argc);
+	
+	if (argc <= 1) {
+		printf("no args def port\n");
+		strlcpy(server_endpoint, "tcp://127.0.0.1:23000", l1);
+	} else if (argc > 1) {
+		printf("PORT: %d\n", atoi(argv[1]));
+		/* SERVER_ENDPOINT "tcp://127.0.0.1:23000" */
+		strlcpy(server_endpoint, "tcp://127.0.0.1:", l1);
+		strlcat(server_endpoint, argv[1], l1);
+	}
+	printf("server_endpoint[%s]\n", server_endpoint);
 
 
 	logfile = fopen("nlog.txt", "a");
@@ -97,14 +112,10 @@ main(int argc, char **argv)
 		printf("error opening logfile\n");
 		exit(1);
 	}
-	/*
-		fprintf(logfile, "main...\n");
-		fflush(logfile);
-	*/
 
-	server(SERVER_ENDPOINT);
+	server(server_endpoint);
 
 	if (logfile != NULL)
 		fclose(logfile);
-	return 0;
+	return EXIT_SUCCESS;
 }
