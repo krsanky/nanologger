@@ -27,7 +27,7 @@ date(void)
 void
 dispatch(char *msg, int sock)
 {
-	char		*LOG_PREFIX = "LOG";
+	char		LOG_PREFIX[] = "LOG";
 	int 		bytes;
 
 	if (strcmp(msg, "DATE") == 0) {
