@@ -1,30 +1,22 @@
-CFLAGS +=		-W -Wall -O2 -std=c99 -g
-LDFLAGS = -lnanomsg
+CFLAGS+=	-W -Wall -O2 -std=c99 -g -pedantic
+CFLAGS+=	-I/usr/local/include
+LDFLAGS+=	-lnanomsg
+LDFLAGS+=	-L/usr/local/lib
 
 all: nanologger nanoclient
 
-nanologger: ${.TARGET}.c
-	$(CC) $(CFLAGS) -o ${.TARGET} \
-		${.TARGET}.c \
-		-L/usr/local/lib -I/usr/local/include \
-		$(LDFLAGS)
+nanologger: $@.c
+	$(CC) ${CFLAGS} -o $@ ${@}.c ${LDFLAGS}
 
-nanoclient: ${.TARGET}.c
-	$(CC) $(CFLAGS) -o ${.TARGET} \
-		${.TARGET}.c \
-		client.c \
-		-L/usr/local/lib -I/usr/local/include \
-		-lnanomsg
-
-test:
-	@echo CURDIR:${.CURDIR}
-	@echo TARGET:${.TARGET} [should be 'test']
+nanoclient: $@.c client.c client.h
+	$(CC) ${CFLAGS} -o $@ ${@}.c client.c ${LDFLAGS}
 
 clean:
-	rm -f writef myserver nanologger nanoclient mdtest params_test
-	rm -rf a.out *.BAK *.cgi *.core
+	rm -f nanologger nanoclient 
+	rm -rf a.out *.BAK *.core
+
 cleanlogs: clean
 	rm -rf nlog.txt log.txt
 
-.PHONY: test clean cleanlogs indent
+.PHONY: clean cleanlogs 
 
